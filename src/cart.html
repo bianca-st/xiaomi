@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="小米有品是小米旗下精品生活电商平台，也是小米“新零售”战略的重要一环。依托小米生态链体系，延续小米的“爆品”模式，致力于将“小米式的性价比”延伸到更广泛的家居生活领域。">
+    <meta name="keywords" content="小米旗下精品生活电商平台,小米旗下精品生活电商,小米电商,小米电商平台,小米精品电商,小米有品,米家有品,精品电商,小米商城,生活电商,小米众筹,小米手机系列小米Note 3,小米5X,小米MIX 2,品质家居,日用,食品,服饰,婴童,箱包">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <title>购物车-小米有品</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/cart.css">
+    <script src="js/jquery.js"></script> 
+    <script src="js/cookie.js"></script>
+    <script src="js/jquery.lazyload.min.js"></script>
+    <script  src="js/lazy.js"></script><!-- 懒加载-->
+</head>
+<script>
+      $(function() {
+
+            var shop = cookie.get('shop');
+            if (shop) {
+                shop = JSON.parse(shop);
+                // console.log(shop)
+                var idList = shop.map(elm => elm.id).join();
+                $.ajax({
+                    type: "get",
+                    url: "../lib/shop.php",
+                    data: {
+                        "idList": idList
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        var template = "";
+                        var total=0;//总金额
+                        var a=0;
+                        response.forEach(function(elm,i) {
+                            var img = JSON.parse(elm.img);
+                            var arr = shop.filter((val, i) => {
+                                return val.id === elm.id;
+                            });
+                            template = `
+                            <li class="good-item cl">
+                                    <!-- 选择 -->
+                                    <div class="select">
+                                        <a class="select-icon active"  href="javascript:;"></a>
+                                    </div>
+                                    <!-- 图片 -->
+                                    <div class="image">
+                                        <img src="${img[0].src}" alt="${img[0].title}">
+                                    </div>
+                                    <!-- 商品名 -->
+                                    <div class="name" data-src="" data-target="_blank">
+                                        <p class="good-name brown-hover">${elm.title}</p>
+                                    </div>
+                                    <!-- 价格 -->
+                                    <div class="price"><span>￥${elm.price}</span></div>
+                                    <!-- 数量 -->
+                                    <div class="num">
+                                        <div class="num-reduce-add">
+                                            <a class="icons icon-minus" href="javascript:;"></a>
+                                            <input type="text" value="${arr[0].num}" class="count-input" min="1" max="${elm.stock}">
+                                            <a class="icons icon-plus"  href="javascript:;"></a>
+                                        </div>
+                                    </div>
+                                    <!-- 金额 -->
+                                    <div class="subtotal"><span>￥${(arr[0].num*elm.price).toFixed(2)}</span></div>
+                                    <!-- 删除 -->
+                                    <div class="del">
+                                        <a class="icons" data-src="" href="javascript:;"></a>
+                                    </div>
+                                </li>`;
+
+                            $('.good_list ul').append(template);
+                             
+                            // 获取购物车商品总数量
+                            // console.log(arr)
+                            // console.log(shop)
+                              a+= parseInt(shop[i].num);
+                              var total_num=`
+                              <span class="m-cart-news">${a}</span>
+                              `;
+                              
+                              if(shop.length-1==i){
+                                $('.icon_card').append(total_num);
+                              }
+                               
+                                
+
+                            
+                        // 选择按钮
+                        $('.good_list ul .select-icon').click(function(){
+                                $(this).toggleClass('active');
+                            })
+
+
+                         
+                    // ----------------------
+                  /*添加数量*/  
+                  var num = 1;     
+                    $('.good_list ').find(".icon-plus").click(function(){  
+                        num++;  
+                        $(this).siblings(".count-input").val(num);  
+                        console.log(elm)
+                       $(this).parent().parent().siblings('.subtotal').children('span').html((num*elm.price).toFixed(2))
+                    });  
+                        
+                    /*减少数量*/   
+                    $('.good_list ').find(".icon-minus").click(function(){  
+                            // 如果文本框的值大于0
+                            num = $(this).siblings(".count-input").val(); 
+                                if(num >1){  
+                                    num--;  
+                                    $(this).siblings(".count-input").val(num); 
+                                    $(this).parent().parent().siblings('.subtotal').children('span').html((num*elm.price).toFixed(2))
+                                }  
+                            
+                               
+                    }); 
+                 
+                    
+                    //---------------------------------------------------- 
+                 
+                    // 合计、结算
+                        total += arr[0].num*elm.price;
+                       if(shop.length-1==i){
+                           fn(total);
+                       }
+                
+                    function fn(total) {
+                        var total_price=`
+                            <span class="total-count"><span>合计：</span>￥${(total.toFixed(2))}</span>
+                        `;
+                        $('.totol-price').append(total_price);
+                
+                     }
+                     
+                    
+
+                    });
+
+
+                // 有商品时显示商品
+                if($('.good_list ul').find('li').length>=1){
+                        $('.container .empty').removeClass('show');
+                        $('.has-good').css('display','block');
+                    }
+
+                    
+                    }
+  
+                });
+            }
+        });
+</script>
+      <!-- 猜您喜欢  ajax -->
+      <script>
+            $(function() {
+                $.ajax({
+                    type: "get",
+                    url: "../lib/getproduct.php",
+                    dataType: "json",
+                    success: function(response) {
+                        var limitedTime = $('.limitedTime .template'),newProduct = $('.newProduct .template');
+                        var template = '',template2 = '';
+                        response.forEach(function(elm, i) {
+                            var img = JSON.parse(elm.img),
+                                discount = parseFloat(elm.price/elm.old_price*10).toFixed(1);//折扣
+                                
+                            template = `
+                                    <li>
+                                        <a href="detail.html?id=${elm.id}"  target="_blank">
+                                            <div class="g-img">
+                                                <img class="lazy" data-original="${img[0].src}" alt="${elm.title}">
+                                            </div>
+                                            <p class="g-info" title="${elm.title}">${elm.title}</p>
+                                            <p class="g-desc" title="${elm.sub_title}">${elm.sub_title}</p>
+                                            <p class="g-price">
+                                                <span class="g-unit">¥</span>
+                                                <span class="g-num">${elm.price}</span>
+                                            </p>
+                                        </a>
+                                    </li>
+                            `;
+
+                            // if(i<5 && i>=0){
+                                $('.guess-like ul').append(template);
+                            // };
+                            
+                                    // 懒加载
+                    $(function() {
+                            $("img.lazy").lazyload({effect: "fadeIn"});
+                            $("img.lazy").lazyload({
+                                placeholder : "imag/grey.gif", //用图片提前占位
+                                    // placeholder,值为某一图片路径.此图片用来占据将要加载的图片的位置,待图片加载时,占位图则会隐藏
+                                effect: "fadeIn", // 载入使用何种效果
+                                    // effect(特效),值有show(直接显示),fadeIn(淡入),slideDown(下拉)等,常用fadeIn
+                                threshold: 100, // 提前开始加载
+                                    // threshold,值为数字,代表页面高度.如设置为200,表示滚动条在离目标位置还有200的高度时就开始加载图片,可以做到不让用户察觉
+                                event: 'click',  // 事件触发时才加载
+                                    // event,值有click(点击),mouseover(鼠标划过),sporty(运动的),foobar(…).可以实现鼠标莫过或点击图片才开始加载,后两个值未测试…
+                                container: $("#container"),  // 对某容器中的图片实现效果
+                                    // container,值为某容器.lazyload默认在拉动浏览器滚动条时生效,这个参数可以让你在拉动某DIV的滚动条时依次加载其中的图片
+                                failurelimit : 10 // 图片排序混乱时
+                                    // failurelimit,值为数字.lazyload默认在找到第一张不在可见区域里的图片时则不再继续加载,但当HTML容器混乱的时候可能出现可见区域内图片并没加载出来的情况,failurelimit意在加载N张可见区域外的图片,以避免出现这个问题.
+                            });
+                        });
+                            
+                        });
+
+                    }
+                });
+            });
+        </script>
+<body>
+    <!-- 顶部、头部 -->
+    <div class="Head">
+            <script>
+                $(".Head").load("head.html");
+            </script>
+        </div>
+
+        <!-- 购物车 -->
+        <div class="cart">
+            <!-- 面包屑导航 -->
+            <div class="container">
+                <div class="bread-nav">
+                    <span><a href="index.html">首页</a></span>
+                    <span><a href="javascript:;">购物车</a></span>
+                </div>
+            </div>
+
+          
+            <div class="container">
+                  <!-- 购物车为空 -->
+                <div class="empty">
+                    <div class="e-desc">
+                        <div class="e-img"></div>
+                        <p class="e-info">购物车还是空的</p>
+                    </div>
+                    <div class="e-btn"><a href="index.html">继续逛</a></div>
+                </div>
+
+                <!-- 购物车不为空 -->
+                <div class="has-good">
+                    <!-- 标题 -->
+                    <div class="title" id="good-title">
+                        <a class="select-icon active"  href="javascript:;"></a>
+                            <span class="all-txt">全选</span>
+                            <span class="product">商品信息</span>
+                            <span class="price">单价</span>
+                            <span class="num">数量</span>
+                            <span class="total">金额</span>
+                            <span class="edit">操作</span>
+                    </div>
+
+                    <!-- 商品列表 -->
+                     <div class="cart-list">
+                        <div class="merchant-info">
+                            <span class="name" >有品精选</span>
+                            <div class="free-post">
+                                <span><span class="postimg">!</span>已免运费</span>
+                                <span class="layer hide">
+                                    有品精选商品，即有品配送和第三方商家发货的商品，单笔订单满99元免运费，不满99元收10元运费。
+                                </span>
+                            </div>
+                        </div>
+                        <!-- 列表开始 -->
+                        <div class="good_list">
+                            <ul>
+                                <!-- <li class="good-item cl"> -->
+                                    <!-- 选择 -->
+                                    <!-- <div class="select">
+                                        <a class="select-icon"  href="javascript:;"></a>
+                                    </div> -->
+                                    <!-- 图片 -->
+                                    <!-- <div class="image">
+                                        <img src="images/cart2.png" alt="小米电视4X 55英寸">
+                                    </div> -->
+                                    <!-- 商品名 -->
+                                    <!-- <div class="name" data-src="" data-target="_blank">
+                                        <p class="good-name brown-hover">洛贝依多功能弹跳椅 灰色</p>
+                                    </div> -->
+                                    <!-- 价格 -->
+                                    <!-- <div class="price"><span>￥159</span></div> -->
+                                    <!-- 数量 -->
+                                    <!-- <div class="num">
+                                        <div class="num-reduce-add">
+                                            <a class="icons icon-minus" data-src="" href="javascript:;"></a>
+                                            <span class="txt">1</span>
+                                            <a class="icons icon-plus" data-src="" href="javascript:;"></a>
+                                        </div>
+                                    </div> -->
+                                    <!-- 金额 -->
+                                    <!-- <div class="subtotal"><span>￥159</span></div> -->
+                                    <!-- 删除 -->
+                                    <!-- <div class="del">
+                                        <a class="icons" data-src="" href="javascript:;"></a>
+                                    </div> -->
+                                <!-- </li> -->
+                            </ul>
+                        </div>
+                     </div>
+
+                     <!-- 结算-----计算总金额 -->
+                     <div class="cart-total cl">
+                         <!-- 全选 -->
+                        <div class="ico fl">
+                            <a class="m-icons m-icons-check select-icon active" href="javascript:;"></a>
+                            <span class="select-text">全选</span>
+                            <!-- <span class="selected">已选0件</span> -->
+                        </div>
+                        <!-- 合计 -->
+                        <div class="totol-price">
+                            <!-- <span class="total-count"><span>合计：</span>￥0.00</span> -->
+                        </div>
+                        <span class="checkout disable fr">去结算</span>
+                     </div>
+                </div>
+            </div>
+
+            <!-- 猜您喜欢 -->
+            <div class="guess-like">
+                <div class="container">
+                    <div class="goods">
+                        <h2>猜您喜欢</h2>
+                        <ul>
+                            <!-- <li>
+                                <a href="javascript:;">
+                                    <div class="g-img">
+                                        <img src="images/g1.png" alt="">
+                                    </div>
+                                    <p class="g-info" title="空气净化器滤芯">空气净化器滤芯</p>
+                                    <p class="g-desc" title="3层高效净化悬浮物、可吸入颗粒物、甲醛与异味。小米空气净化器、小米空气净化器2、米家空气净化器Pro 通用">3层高效净化悬浮物、可吸入颗粒...</p>
+                                    <p class="g-price">
+                                        <span class="g-unit">¥</span>
+                                        <span class="g-num">149</span>
+                                    </p>
+                                </a>
+                            </li>
+                           -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+  <!-- 尾部、右侧浮窗、登录注册弹窗 -->
+  <div class="footer">
+        <script>
+            $(".footer").load("footer.html");
+        </script>
+</div>
+
+ <body>
+
+
+<script src="js/global.js"></script>
+<script>
+    $(function(){
+         // 没有商品时显示购物车为空
+         if($('.good_list ul').find('li').length<1){
+                $('.container .empty').addClass('show');
+                $('.has-good').css('display','none');
+            }
+
+        // 已免运费
+        $('.free-post').hover(function(){
+            $('.layer').toggleClass('hide')
+        })
+
+ 
+        // 全选按钮
+        $('#good-title .select-icon,.cart-total .select-icon').click(function(){
+                if($(this).hasClass('active')){
+                $('.select-icon').removeClass('active');
+                $('.cart-total .checkout').addClass('disable');
+                }else{
+                    $('.select-icon').addClass('active');
+                    $('.cart-total .checkout').removeClass('disable');
+                }
+       
+        })
+
+         
+
+
+        // 合计、结算
+
+
+    })
+</script>
+</html>

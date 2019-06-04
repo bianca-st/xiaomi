@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="小米有品是小米旗下精品生活电商平台，也是小米“新零售”战略的重要一环。依托小米生态链体系，延续小米的“爆品”模式，致力于将“小米式的性价比”延伸到更广泛的家居生活领域。">
+    <meta name="keywords" content="小米旗下精品生活电商平台,小米旗下精品生活电商,小米电商,小米电商平台,小米精品电商,小米有品,米家有品,精品电商,小米商城,生活电商,小米众筹,小米手机系列小米Note 3,小米5X,小米MIX 2,品质家居,日用,食品,服饰,婴童,箱包">
+    <link rel="shortcut icon" href="images/favicon1.ico">
+    <title>小米有账号-注册</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+    <div class="wrap register">
+        <div class="layout " id="layout">
+            <div class="mainbox">
+                <!-- header -->
+                <div class="header_tit">
+                    <div class="milogo"><img src="images/milogo.png" alt=""></div>
+                    <h4 class="login-title">注册小米帐号</h4>
+                </div>
+                    <div  class="register_area">
+                        <div class="register-box">
+                               <!-- 用户名 -->
+                               <h4 class="tit_normal">用户名</h4>
+                               <label for="username" class="labelbox">
+                                   <input  autocomplete="off" type="text" name="username" id="username" placeholder="请输入用户名"><span class="span"></span>
+                               </label>
+                           
+                            <!-- 手机号 -->
+                            <h4 class="tit_normal">手机号码</h4>
+                            <label for="phone" class="labelbox">
+                                <input  autocomplete="off" type="text" name="phone" id="phone" placeholder="请输入手机号码">
+                                <span class="span"></span>
+                            </label>
+                             <!-- 验证码 -->
+                             <h4 class="tit_normal">验证码</h4>
+                             <label for="code" class="labelbox">
+                                     <input  autocomplete="off" type="text" name="code" id="code" placeholder="请输入手机验证码">
+                                     <input type="button" id="code-btn" value="获取验证码" onclick="sendemail()" >
+                             </label>
+                            
+                            <!-- 密码 -->
+                            <h4 class="tit_normal">密码</h4>
+                            <label for="password" class="labelbox">
+                                    <input  autocomplete="off" type="password" name="password" id="password" placeholder="请输入密码">
+                                    <span class="span"></span>
+                            </label>
+                           <label for="login-btn" class=" login-btn">
+                               <input  id="login-btn" type="submit" value="立即注册" >
+                           </label>
+                        </div>
+                    </form>
+                       <!-- 注册协议 -->
+                       <div class="agreement">
+                            <div class="msg"> 
+                                <i class="icon_select"></i>注册帐号即表示您同意并愿意遵守小米
+                                 <a href="javascript:;"  title="用户协议" target="_blank">用户协议</a>和
+                                 <a href="javascript:;"  title=" 隐私政策 " target="_blank"> 隐私政策 </a>
+                            </div>
+                        </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部2 -->
+    <div class="footer2">
+        <div class="link">
+            <ul>
+                <li><a href="javascript:;" class="current">登录</a>|</li>
+                <li><a href="javascript:;">繁体</a>|</li>
+                <li><a href="javascript:;">English</a>|</li>
+                <li><a href="javascript:;">常见问题</a>|</li>
+                <li><a href="javascript:;">隐私政策</a>|</li>
+            </ul>
+        </div>
+        <p class="nf-intro">
+            小米公司版权所有-京ICP备10046444-
+            <a class="beian-record-link" target="_blank" href="javascript:;">
+                <span><img src="images/ghs.png"></span>
+                京公网安备11010802020134号</a>
+                -京ICP证110507号
+            </p>
+    </div>
+ <body>
+
+<script src="js/jquery.js"></script> 
+
+ </body>
+</html>
+
+<!-- 表单验证 -->
+<script>
+
+    // 验证用户名
+     $('#username').keyup(function(){
+         var that =this;
+         var reg=/^\w{6,10}$/;//6-10位数字字母下划线组合
+        if(reg.test($(this).val())){
+            // 如果用户名格式正确，就发送数据到 register.php
+            $.ajax({
+                type:"post",
+                url:"../lib/username.php",
+                data:{
+                    username:$(this).val()
+                },
+                dataType:"json",
+                success:function(data){
+                    // 如果用户名存在
+                        if(data.has){
+                            console.log(data.msg);
+                            $(that).siblings('.span').html(data.msg).css('color','red');
+                            $(that).attr('data-pass','false');
+                        }else{
+                            $(that).siblings('.span').empty();
+                            $(that).attr('data-pass','true');
+                        }
+                }  
+
+            });
+            }else{
+                    $(that).siblings('.span').html('6位以上数字字母下划线').css('color','red');
+                    $(that).attr('data-pass','false');
+                }
+
+        });
+
+
+
+// 验证手机号
+$('#phone').keyup(function(){
+         var that =this;
+         var reg=/^1[3-9]\d{9}$/;//手机号码正则
+        if(reg.test($(this).val())){
+
+            // 若手机号格式正确，发送数据到 phone.php，验证号码是否存在
+            $.ajax({
+                type:"post",
+                url:"../lib/phone.php",
+                data:{
+                    phone:$(this).val()
+                },
+                dataType:"json",
+                success:function(data){
+                        if(data.has){
+                            // 如果手机号存在
+                            $(that).siblings('.span').html(data.msg).css('color','red');
+                            $(that).attr('data-pass','false');
+                        }else{
+                            $(that).siblings('.span').empty();
+                            $(that).attr('data-pass','true');
+                        }
+                }
+            });
+          
+            }else{
+                    $(that).siblings('.span').html('格式错误').css('color','red');
+                    $(that).attr('data-pass','false');
+                }
+
+        });
+
+
+
+// 验证密码
+$('#password').keyup(function(){
+         var that =this;
+         var reg=/^.{6,}$/;//密码正则
+        if(reg.test($(this).val())){
+            $(that).attr('data-pass','true');
+            $(that).siblings('.span').html('');
+            
+            }else{
+                // 如果密码格式不正确
+                    $(that).siblings('.span').html('至少6位以上').css('color','red');
+                    $(that).attr('data-pass','false');
+                }
+
+                // 鼠标失去焦点且value值为空时
+                // $(this).blur(function(){
+                //     if( $(this).val() == ""){
+                //         $(this).siblings('.span').html('请输入密码').css('color','red');
+                //     }   
+                // }); 
+                
+        });
+
+        
+
+//  提交判断
+// $('input').keydown(function(){
+//     var pass = $('input[data-pass="true"]');
+//     console.log(pass.length)
+//     // if( $('.icon_select').hasClass('active') ){
+//         if(pass.length >=2){
+//             $('#login-btn').removeAttr('disabled')
+//         }else{
+//             $('#login-btn').attr('disabled','disabled')
+//         }
+       
+//     // }
+// })
+
+//点击注册按钮-提交数据到后台
+$('#login-btn').click(function(){
+    // 点击注册按钮-发送数据到register.php
+    $.ajax({
+            type:"post",
+            url:"../lib/register.php",
+            data:{
+                username:$('#username').val(),
+                phone:$('#phone').val(),
+                password:$('#password').val()
+            },
+            dataType:"json", 
+            success:function(data){
+                if(data.has){
+                    // 如果提交成功
+                    // alert('注册成功')
+                    location.href='login.html';
+                       
+                    }else{
+                        alert(data.msg);
+                    }
+                }
+        });
+})
+
+
+</script>
+
+<script>
+
+        // 注册协议
+        $('.msg .icon_select').click(function(){
+               $(this).toggleClass('active');
+       });
+       
+       
+           // 验证码
+           var countdown = 60;
+           function sendemail() {
+               var obj = $("#code-btn");
+               settime(obj);
+           }
+       
+           function settime(obj) { //发送验证码倒计时
+               if (countdown == 0) {
+                   obj.attr('disabled', false);
+                   obj.val("发送验证码");
+                   countdown = 60;
+                   return;
+               } else {
+                   obj.attr('disabled', true);
+                   obj.val("重新发送(" + countdown + ")");
+                   countdown--;
+               }
+               setTimeout(function () {
+                       settime(obj)
+                   }
+                   , 1000);      
+           
+           }
+</script>

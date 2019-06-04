@@ -1,0 +1,68 @@
+@charset 'utf-8';
+.download-wrap {
+  height: 540px;
+  margin-bottom: 70px;
+  background-color: #f5f4ed;
+}
+.download-wrap .container {
+  position: relative;
+  padding-left: 560px;
+  width: 520px;
+  padding-top: 30px;
+  height: 510px;
+  background: url(../images/download_bg.jpeg) no-repeat center center;
+}
+.download-wrap .container .download-img {
+  width: 455px;
+  height: 542px;
+  position: absolute;
+  left: 40px;
+  top: 65px;
+}
+.download-wrap .container .download-info {
+  margin-top: 35px;
+  text-align: center;
+}
+.download-wrap .container .download-info .down-tit {
+  margin-bottom: 20px;
+  font-size: 40px;
+  font-weight: 400;
+  color: #333;
+}
+.download-wrap .container .download-info .info-list {
+  height: 82px;
+  overflow: hidden;
+}
+.download-wrap .container .download-info .info-list .list-item {
+  display: inline-block;
+  margin: 0 24px;
+  text-align: center;
+}
+.download-wrap .container .download-info .info-list .list-item .d-price {
+  font-size: 44px;
+  color: #fd862f;
+}
+.download-wrap .container .download-info .info-list .list-item .d-price span {
+  font-size: 15px;
+}
+.download-wrap .container .download-info .info-list .list-item .d-info {
+  font-size: 18px;
+  color: #666;
+}
+.download-wrap .container .QR_code {
+  padding: 10px 10px 5px;
+  width: 152px;
+  margin: 44px auto 0;
+  background-color: #fff;
+}
+.download-wrap .container .QR_code .img {
+  width: 152px;
+  height: 152px;
+  overflow: hidden;
+}
+.download-wrap .container .QR_code .download-info {
+  margin-top: 10px;
+  color: #333;
+  font-size: 14px;
+  text-align: center;
+}

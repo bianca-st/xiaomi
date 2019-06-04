@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="小米有品是小米旗下精品生活电商平台，也是小米“新零售”战略的重要一环。依托小米生态链体系，延续小米的“爆品”模式，致力于将“小米式的性价比”延伸到更广泛的家居生活领域。">
+    <meta name="keywords" content="小米旗下精品生活电商平台,小米旗下精品生活电商,小米电商,小米电商平台,小米精品电商,小米有品,米家有品,精品电商,小米商城,生活电商,小米众筹,小米手机系列小米Note 3,小米5X,小米MIX 2,品质家居,日用,食品,服饰,婴童,箱包">
+    <link rel="shortcut icon" href="images/favicon.ico">
+    <title>小米有品-坚持做感动人心，价格厚道的好产品</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/detail.css">
+    <script src="js/jquery.js"></script>
+    <script src="js/cookie.js"></script>
+    <script src="js/global.js"></script>
+    <script src="js/jquery.lazyload.min.js"></script>
+    <script  src="js/lazy.js"></script><!-- 懒加载-->
+</head>
+
+
+<!-- ajax -->
+<script>
+    $(function() {
+        var id = location.search.split('=')[1];
+        $.ajax({
+            type: "get",
+            url: "../lib/detail.php",
+            data: {
+                id: id
+            },
+            dataType: "json",
+            success: function(data) {
+                var img = JSON.parse(data.img);
+                var detail_img = JSON.parse(data.detail);
+                var recommend = JSON.parse(data.recommend);
+                var title =data.title;
+
+                // $('document').title =title;
+               
+                // 大图
+                var smallimg=`<img src="${img[0].src}" alt="${title}">`;
+                $('.left-img .main .smallimg').append(smallimg);
+                // 放大图
+                var bigimg=`
+                <img src="${img[0].src}" alt="">
+                `;
+                $('.left-img .main .bigimg').append(bigimg);
+
+                 // 小图
+                 img.forEach(function(elm, i) {
+                    var thum =`
+                            <div class="thum-pic"><img class="lazy" data-original="${img[i].src}" alt="${title}"></div>
+                            `;
+                        $('.thum-container').append(thum);      
+                });
+                  // -------------------图片效果-------------------------
+                  $(function() {
+                    //   点击小图切换
+                    var btns = $('.thum-container>div'); //选择所有按钮
+                    btns.on('click', function() {
+                        var index = btns.index(this); // 获得dom元素在jQuery对象中的索引位置
+                        var _src=$(this).children('img').attr('src');
+                        $('.smallimg img,.bigimg img').attr('src',_src)
+                    });
+
+                    // 放大镜
+                        // 鼠标悬停大图显示消失
+                    $('.left-img .main').hover(function(){
+                        $(this).children('.smallimg').children('.hoverbox').toggleClass('show')
+                        $(this).children('.bigimg').toggleClass('show')
+                    })
+
+                    var ratio= $('.bigimg img').width()/$('.smallimg').width();//倍数的比例(放大)
+
+                    // 小滑块hoverbox的宽高需要按比例赋值
+                    var hoverbox_w=$('.smallimg').width()*$('.bigimg').width()/$('.bigimg img').width(),
+                    hoverbox_h=$('.smallimg').height()*$('.bigimg').height()/$('.bigimg img').height();
+                    $('.hoverbox').css({
+                        'width':hoverbox_w + "px",
+                        'height':hoverbox_h + "px"
+                    });
+
+                    $('.smallimg').mouseover(function(){
+                        $('.smallimg').mousemove(function(ev){
+                            var x=ev.pageX-$('.main').offset().left-$('.hoverbox').width()/2,//x轴移动距离
+                                y=ev.pageY-$('.main').offset().top-$('.hoverbox').height()/2;//y轴移动距离
+
+                                //控制边界
+                                if (x < 0) {
+                                    x = 0;
+                                } else if (x > $('.smallimg').width() - $('.hoverbox').width()) {
+                                    x = $('.smallimg').width() - $('.hoverbox').width();
+                                }
+
+                                if (y < 0) {
+                                    y = 0;
+                                } else if (y > $('.smallimg').height() -$('.hoverbox').height()) {
+                                    y = $('.smallimg').height() - $('.hoverbox').height();
+                                }
+
+                            $('.hoverbox').css('left',x);
+                            $('.hoverbox').css('top',y);
+
+
+                            $('.bigimg img').css({
+                                'left': -x * ratio + "px",
+                                'top': -y * ratio + "px"
+                            })
+                        }) 
+                    });
+                    
+                });
+                // -------------------图片效果end-------------------------
+
+
+                
+
+                
+                // 标题
+                var name = `    
+                    <h1 class="good-name fl">${title}</h1>
+                    <div class="good-tag fl">${data.label}</div>
+                `;
+                $('.name').append(name);
+
+                // 副标题
+                var summary =`${data.sub_title}`;
+                $('.summary').append(summary);
+
+                // 价格
+                var price=`
+                            <span class="money-symbol">¥</span>
+                            <span class="value">${data.price}</span>
+                            <span class="market-price">¥${data.old_price}</span>
+                `;
+                $('.card .price').append(price);
+
+
+                // 详情图
+                detail_img.forEach(function(elm, i) {
+                    var main_body=`<img class="lazy" data-original="${detail_img[i].src}" alt="">`;
+                    $('.main-body div').append(main_body);  
+                });
+               
+                // 相关推荐
+                    // 商家信息
+                    var business=`
+                        <div class="icon-container">
+                                <img src="${recommend[0][0].brand_img}">
+                                <div class="title-container">
+                                    <h6 title="${recommend[0][0].brand_name}">${recommend[0][0].brand_name}</h6>
+                                    <p>${recommend[0][0].brand_tit}</p>
+                                </div>
+                                <div class="enter-btn">
+                                    <a href="javascript:;">进入</a>
+                                </div>
+                            </div>
+                    `;
+                    $('.recommend .flagship').append(business); 
+            
+
+                    // 推荐产品
+                    recommend[1].forEach(function(elm, i) {
+                        var recommend_product = `
+                            <div class="best-product">
+                                <div class="image-container">
+                                    <div class="img-container" >
+                                        <img src="${elm.src}"  alt="${elm.title}" >
+                                    </div>
+                                </div>
+                                <p title="${elm.sub_title}">${elm.sub_title}</p>
+                                <h5>${elm.title}</h5>
+                                <h4>
+                                    <span class="dollar">￥</span>
+                                    <span class="price">${elm.price}</span>
+                                </h4>
+                            </div>
+                        `;
+                        $('.recommend .product').append(recommend_product); 
+        
+                    });
+
+                    //数量
+                    var number =`
+                        <input type="text" value="1" class="count-input" min="1" max="${data.stock}"> 
+                    `;
+                    $(number).insertAfter('.minus-btn'); 
+
+                    // ---------数量增减-------------------------------
+                    var add,reduce,num,num_txt;  
+                    add=$('.count-container').find(".add-btn");//添加数量  
+                    reduce=$(".minus-btn");//减少数量  
+                    num="";//数量初始值  
+                    num_txt=$(".count-input");//接受数量的文本框     
+                        
+                    /*添加数量*/  
+                    add.click(function(){  
+                        num = $(".count-input").val();      
+                        num++;  
+                        num_txt.val(num);  
+                        //ajax代码可以放这里传递到数据库实时改变总价  
+                    });  
+                        
+                    /*减少数量*/   
+                    reduce.click(function(){  
+                    //如果文本框的值大于1
+                        num = $(".count-input").val();  
+                        if(num >1){  
+                            num--;  
+                            num_txt.val(num); 
+                        }  
+                    });  
+                    //-------------------数量增减end--------------------------------- 
+
+
+                // 加入购物车
+                $('.btn-cart').on('click', function() {
+                    var id=data.id,price=data.price,num=$('.count-input').val();
+                    console.log(id, price, num)
+                     // 加入购物车
+                    function addShopCar(id, price, num) {
+                        var shop = cookie.get('shop'); //从cookie获取shop
+                        var product = {
+                            "id": id,
+                            "price": price,
+                            "num": num
+                        };
+
+                        if (shop) {
+                            shop = JSON.parse(shop); // cookie中如果有数据 这个数据是json字符串 转成对象
+
+                            if (shop.some(elm => elm.id == id)) {
+                                shop.forEach(function(elm, i) {
+                                    elm.id == id ? elm.num = num : null;
+                                });
+                            } else {
+                                shop.push(product);
+                            }
+                            cookie.set('shop', JSON.stringify(shop), 1);
+
+
+                            // 加入购物车成功弹窗
+                            $('.Popup .m-fade').addClass('in');
+                            setTimeout(function(){
+                                $('.Popup .m-fade').removeClass('in');
+                            },1000)
+
+
+                        } else {
+                            shop = [];
+                            shop.push(product);
+                            cookie.set('shop', JSON.stringify(shop), 1);
+                        }
+
+                        var shop = cookie.get('shop');
+                        if (shop) {
+                            shop = JSON.parse(shop);
+                            var idList = shop.map(elm => elm.id).join();
+                            $.ajax({
+                                type: "get",
+                                url: "../lib/shop.php",
+                                data: {
+                                    "idList": idList
+                                },
+                                dataType: "json",
+                                success: function(response) {
+                                    var template = "";
+                                    var total=0;//总金额
+                                    var a=0;
+                                    response.forEach(function(elm,i) {
+                                        var img = JSON.parse(elm.img);
+                                        var arr = shop.filter((val, i) => {
+                                            return val.id === elm.id;
+                                        });
+                                        
+                                        // 获取购物车商品总数量
+                                        a+= parseInt(shop[i].num);
+                                        var total_num=`
+                                        <span class="m-cart-news">${a}</span>
+                                        `;
+                                        
+                                        if(shop.length-1==i){
+                                            $('.icon_card').append(total_num);
+                                        }
+
+                                });
+
+                                }
+            
+                            });
+                        }
+                        
+
+                    }
+                    // -------------------end
+                    addShopCar(id, price, num);
+                });
+
+   
+              // 懒加载
+              $(function() {
+                    $("img.lazy").lazyload({effect: "fadeIn"});
+                    $("img.lazy").lazyload({
+                        placeholder : "imag/grey.gif", //用图片提前占位
+                            // placeholder,值为某一图片路径.此图片用来占据将要加载的图片的位置,待图片加载时,占位图则会隐藏
+                        effect: "fadeIn", // 载入使用何种效果
+                            // effect(特效),值有show(直接显示),fadeIn(淡入),slideDown(下拉)等,常用fadeIn
+                        threshold: 100, // 提前开始加载
+                            // threshold,值为数字,代表页面高度.如设置为200,表示滚动条在离目标位置还有200的高度时就开始加载图片,可以做到不让用户察觉
+                        event: 'hover',  // 事件触发时才加载
+                            // event,值有click(点击),mouseover(鼠标划过),sporty(运动的),foobar(…).可以实现鼠标莫过或点击图片才开始加载,后两个值未测试…
+                        container: $("#container"),  // 对某容器中的图片实现效果
+                            // container,值为某容器.lazyload默认在拉动浏览器滚动条时生效,这个参数可以让你在拉动某DIV的滚动条时依次加载其中的图片
+                        failurelimit : 10 // 图片排序混乱时
+                            // failurelimit,值为数字.lazyload默认在找到第一张不在可见区域里的图片时则不再继续加载,但当HTML容器混乱的时候可能出现可见区域内图片并没加载出来的情况,failurelimit意在加载N张可见区域外的图片,以避免出现这个问题.
+                        });
+                });
+            }
+
+            
+        });
+          
+
+    });
+</script>
+
+
+ <body>
+     <!-- 顶部、头部 -->
+     <div class="Head">
+        <script>
+            $(".Head").load("head.html");
+        </script>
+     </div>
+ 
+    <!-- 商品详情 -->
+    
+    <div class="detail ">
+            <div class="container">
+                <!-- 详情头部 -->
+                <div class="detail-header cl">
+                    <div class="left-img fl cl">
+                        <div class="main fl">
+                            <div class="smallimg">
+                                <!-- <img src="images/detail//main1.jpg" alt=""> -->
+                                <div class="hoverbox"></div>
+                            </div>
+                            <div class="bigimg">
+                                <!-- <img src="images/limit2_1.jpg" alt=""> -->
+                            </div>
+                        </div>
+                        <div class="thum fr">
+                            <div class="thum-container">
+                                <!-- <div class="thum-pic active"><img src="images/detail/thum1.jpg" alt=""></div>
+                                 -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="right-info fr">
+                        <div class="name cl">
+                            <!-- <h1 class="good-name fl">Wicue12寸彩虹液晶手写板（多彩版）（5.27日发货）</h1>
+                            <div class="good-tag fl">限时购</div> -->
+                        </div>
+                        <div class="summary">
+                            <!-- 液晶彩色手写技术|无背光不伤眼|一键清除|环保低耗能 -->
+                        </div>
+                        <div class="promotion-wrap cl">
+                            <p class="pro-tit fl">促销:</p>
+                            <div class="d-gift-info">
+                                <span class="d-gift-type">限时购</span>
+                                <span class="d-gift-text">购买不超过 20 件时享受抢购价，超出数量以结算价为准</span>
+                            </div>
+                        </div>
+                        <!-- 价格 -->
+                        <div class="card">
+                            <div class="price-line">
+                                <h5 class="sku-title">售价</h5>
+                                <div class="price">
+                                    <!-- <span class="money-symbol">¥</span>
+                                    <span class="value">89</span>
+                                    <span class="market-price">¥109</span> -->
+                                </div>
+                            </div>
+                            <div class="service-line cl">
+                                <h5 class="sku-title fl">服务<p class="icon">!</p></h5>
+                                <div class="service cl fl">
+                                    <div class="service-item">
+                                        <a class="icons-service " href="javascript:;"></a>
+                                        <span class="service-item-text">满99包邮</span>
+                                    </div>
+                                     <div class="service-item">
+                                        <a class="icons-service " href="javascript:;"></a>
+                                        <span class="service-item-text">有品三方</span>
+                                    </div>
+                                    <div class="service-item">
+                                        <a class="icons-service " href="javascript:;"></a>
+                                        <span class="service-item-text">由有品配送发货，成都体九生物科技有限公司提供售后</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                          
+                        </div>
+
+                        <!-- 地址 -->
+                        <div class="address-line">
+                                <h5 class="sku-title">配送区域</h5>
+                                <div class="address">
+                                    <div>
+                                        <span>北京 北京市 海淀区</span>
+                                        <span>&nbsp;有货</span>
+                                        <a>修改</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        <!-- 数量 -->
+                        <div class="count-line cl">
+                            <h5 class="count-title">数量</h5>
+                            <div class="count-container fl">
+                                <div class="minus-btn">
+                                    <a class="icons-reduce " href="javascript:;"></a>
+                                </div>
+                                <!-- <input type="text" value="1" class="count-input" min="1" max="${data.num}"> -->
+                                <div class="add-btn">
+                                        <a class="icons-add " href="javascript:;"></a>
+                                    </div>
+                            </div>
+                        </div>
+      
+
+                        <!-- 购买、加购物车等 -->
+                        <div class="btn-line">
+                            <div class="buy-container">
+                                <a class="btn-cart btn-g" href="javascript:;">加入购物车</a>
+                                <a class="btn-buy btn-g" href="javascript:;">立即购买</a>
+                            </div>
+                            <!-- 收藏 -->
+                            <div class="favor-btn ">
+                                <a class="icons-collection " href="javascript:;"></a>
+                                <p>收藏</p>
+                            </div>
+                            <div class="favor-btn service-btn">
+                                <a class="icons-collection " href="javascript:;"></a>
+                                <p>客服</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 加入成功弹窗 -->
+                    <div class="Popup">
+                        <div class="m-fade ">
+                            <div class="m-toast ">
+                                <div class="m-alert m-alert-success">加入购物车成功</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- ----------------------------------------------------------- -->
+
+                <!-- 详情内容 -->
+                <div class="detail-content fl">
+                    <div class="info fl">
+                        <div class="nav-title">
+                            <ul class="info-nav cl">
+                                <li class="info-nav-item active" ><div>产品介绍</div></li>
+                                <li class="info-nav-item" ><div>评论</div></li>
+                                <li class="info-nav-item" ><div>常见问题</div></li>
+                                <li class="info-nav-item" ><div>检测报告</div></li>
+                            </ul>
+                        </div>
+                        <!-- 详情图 -->
+                        <div class="main-body">
+                            <div>
+                                <!-- <img src="images/detail/d1.jpeg" alt="">-->
+                            </div>
+                            <img src="images/detail/global.png" alt=""> 
+                        </div>
+                    </div>
+
+
+
+                    <!-- 相关推荐 -->
+                    <div class="recommend">
+                        <div class="flagship">
+                            <!-- <div class="icon-container">
+                                <img src="images/detail/limit1_brand.jpg">
+                                <div class="title-container">
+                                    <h6 title="Viomi 云米">Viomi 云米</h6>
+                                    <p>高科技 全屋互联网家电</p>
+                                </div>
+                                <div class="enter-btn">
+                                    <a href="javascript:;">进入</a>
+                                </div>
+                            </div> -->
+                        </div>
+
+                        <!-- 产品 -->
+                        <div class="product">
+                            <h2 class="recommend-title">
+                                <span class="special-line"></span>
+                                    相关推荐
+                                <span class="special-line"></span>
+                            </h2>
+                            <!-- <div class="best-product">
+                                <div class="image-container">
+                                    <div class="img-container" >
+                                        <img src="images/detail/1.png"  alt="青衣美人陈皮黑茶 5.5g*12袋" >
+                                    </div>
+                                </div>
+                                <p title="净制3年陈皮，甄选1号黑茶，玉米纤维袋装">净制3年陈皮，甄选1号黑茶，玉米纤维袋装</p>
+                                <h5>青衣美人陈皮黑茶 5.5g*12袋</h5>
+                                <h4>
+                                    <span class="dollar">￥</span>
+                                    <span class="price">49</span>
+                                </h4>
+                            </div> -->
+                          
+                        </div>
+                    </div>
+                </div>
+           
+        </div>
+    </div>
+
+    <!-- 尾部、右侧浮窗、登录注册弹窗 -->
+    <div class="footer">
+            <script>
+                $(".footer").load("footer.html");
+            </script>
+    </div>
+
+
+ </body>
+</html>
